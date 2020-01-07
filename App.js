@@ -16,10 +16,12 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: "valueFromState",
+      value: 'valueFromState',
+      threadValue: 'tmp',
     };
     this.assignNativeEvent = this.assignNativeEvent.bind(this);
     this.callNativeEvent = this.callNativeEvent.bind(this);
+    this.threadExample = this.threadExample.bind(this);
   }
 
   callNativeEvent() {
@@ -35,6 +37,14 @@ export default class App extends React.Component {
         value = events;
         this.setState({value});
       }
+    });
+  }
+  threadExample() {
+    let threadValue;
+    NativeModules.NativeFunctions.doSomethingExpensive(tmpValue => {
+      console.log('hahahah' + tmpValue);
+      threadValue = tmpValue;
+      this.setState({threadValue});
     });
   }
 
@@ -56,7 +66,8 @@ export default class App extends React.Component {
               style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Call Native Event</Text>
               <Text style={styles.sectionDescription}>
-                Bu fonksiyon çağrılınca native tarafta log atacak.
+                Bu fonksiyon çağrılınca native tarafta log atacak.(xcodeda ve
+                chrome debuggerda görünüyor)
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -68,10 +79,21 @@ export default class App extends React.Component {
               </Text>
             </TouchableOpacity>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{this.state.value}</Text>
+              <Text style={styles.sectionTitleResult}>{this.state.value}</Text>
             </View>
             <TouchableOpacity
-              onPress={() => this.setState({value: "valueFromState"})}
+              onPress={() => this.threadExample()}
+              style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Thread Example</Text>
+              <Text style={styles.sectionDescription}>
+                native tarafta async Call yapan fonksiyonu çağırma
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitleResult}>{this.state.threadValue}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => this.setState({value: "valueFromState", threadValue: 'tmp'})}
               style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Clear</Text>
             </TouchableOpacity>
@@ -81,7 +103,6 @@ export default class App extends React.Component {
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -97,11 +118,19 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
+    borderBottomWidth: 0.4,
+    paddingBottom: 10,
+    borderBottomColor: Colors.black,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: '600',
     color: Colors.black,
+  },
+  sectionTitleResult: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#ff0000',
   },
   sectionDescription: {
     marginTop: 8,

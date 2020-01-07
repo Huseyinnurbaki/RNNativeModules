@@ -33,4 +33,14 @@ RCT_EXPORT_METHOD(callBackMethodExample:(RCTResponseSenderBlock)callback)
   callback(@[[NSNull null], events]);
 }
 
+RCT_EXPORT_METHOD(doSomethingExpensive:(RCTResponseSenderBlock)callback)
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // Call long-running code on background thread
+    // You can invoke callback from any thread/queue
+    NSString *tmpValue = @"LOL";
+    
+    callback(@[tmpValue]);
+  });
+}
 @end
